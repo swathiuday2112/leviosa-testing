@@ -5,10 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LMS Admin Login</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- Firebase SDK -->
-    <script defer src="/__/firebase/11.0.2/firebase-app-compat.js"></script>
-    <script defer src="/__/firebase/11.0.2/firebase-firestore-compat.js"></script>
-    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
 </head>
 <body>
     <div class="container">
@@ -26,50 +22,6 @@
             <button type="submit">Next</button>
         </form>
     </div>
-
-    <!-- JavaScript -->
-    <script>
-        // Function to initialize Firestore and return the database instance
-        function getFirestoreDB() {
-            // Initialize Firestore
-            const db = firebase.firestore();
-            return db;
-        }
-    
-        // Populate the dropdown with domain names from Firestore
-        async function populateDomainDropdown() {
-            const db = getFirestoreDB(); // Get the Firestore instance
-            const domainDropdown = document.getElementById("domainDropdown");
-    
-            try {
-                const snapshot = await db.collection("school").get();
-                snapshot.forEach(doc => {
-                    const option = document.createElement("option");
-                    option.value = doc.id;
-                    option.textContent = doc.id; // Use doc.id as domain name
-                    domainDropdown.appendChild(option);
-                });
-            } catch (error) {
-                console.error("Error fetching domain names:", error);
-            }
-        }
-    
-        // Handle domain selection
-        function handleDomainSelection(event) {
-            event.preventDefault();
-            const selectedDomain = document.getElementById("domainDropdown").value;
-            if (selectedDomain) {
-                // Navigate to the next page with the selected domain
-                window.location.href = `admin-login.html?domain=${encodeURIComponent(selectedDomain)}`;
-            } else {
-                alert("Please select a domain.");
-            }
-        }
-    
-        // Call the function to populate the dropdown on page load
-        document.addEventListener("DOMContentLoaded", populateDomainDropdown);
-    </script>
-    
 
 </body>
 </html>
