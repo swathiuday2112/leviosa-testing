@@ -5,10 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LMS Admin Login</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- Firebase SDK -->
-    <script defer src="/__/firebase/11.0.2/firebase-app-compat.js"></script>
-    <script defer src="/__/firebase/11.0.2/firebase-firestore-compat.js"></script>
-    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
 </head>
 <body>
     <div class="container">
@@ -19,47 +15,5 @@
         </form>
         <p id="errorMessage" class="error"></p>
     </div>
-
-    <script>
-
-        // Get the selected domain from the URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const selectedDomain = urlParams.get("domain");
-
-        if (!selectedDomain) {
-            alert("No domain selected. Redirecting to the home page.");
-            window.location.href = "institution-login.html";
-        }
-
-        // Fetch institution name and update greeting
-        async function updateGreeting() {
-            const db = firebase.firestore();
-            const doc = await db.collection("school").doc(selectedDomain).get();
-            if (doc.exists) {
-                document.getElementById("greeting").textContent = `Hello, Admin at ${doc.data().name}`;
-            } else {
-                alert("Domain not found. Redirecting to the home page.");
-                window.location.href = "institution-login.html";
-            }
-        }
-
-        updateGreeting();
-        
-
-        // Validate login ID
-        async function validateLogin(event) {
-            const db = firebase.firestore();
-            event.preventDefault();
-            const loginId = document.getElementById("loginId").value.trim();
-            const doc = await db.collection("school").doc(selectedDomain).get();
-            if (doc.exists && doc.data().admin_emails.includes(loginId)) {
-                // Redirect to the next page
-                window.location.href = `account-selection.html?domain=${encodeURIComponent(selectedDomain)}`;
-            } else {
-                // Show error message
-                document.getElementById("errorMessage").textContent = "Invalid login ID";
-            }
-        }
-    </script>
 </body>
 </html>
