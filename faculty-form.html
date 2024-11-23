@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty Account Creation</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Firebase SDK -->
+    <script defer src="/__/firebase/11.0.2/firebase-app-compat.js"></script>
+    <script defer src="/__/firebase/11.0.2/firebase-firestore-compat.js"></script>
+    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+</head>
+<body>
+    <div class="container">
+        <h2>Create Faculty Account</h2>
+        <form id="facultyForm" onsubmit="handleFacultyCreation(event)">
+            <input type="text" id="facultyName" placeholder="Enter Faculty Name" required>
+            <input type="email" id="facultyLoginId" placeholder="Enter Faculty Login ID" required>
+            <button type="submit">Create Account</button>
+        </form>
+        <br>
+        <p id="message" class="message"></p>
+    </div>
+    <div id="successPopup" class="popup">
+        <p>Account created successfully!</p>
+    </div>
+
+    <script>
+        // Get the selected domain from the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const selectedDomain = urlParams.get("domain");
+
+        if (!selectedDomain) {
+            alert("No domain selected. Redirecting to the home page.");
+            window.location.href = "institution-login.html";
+        }
+
+        // Firestore reference
+        
+
+        // Handle Faculty Account Creation
+        async function handleFacultyCreation(event) {
+            const db = firebase.firestore();
+            event.preventDefault();
+
+            const facultyName = document.getElementById("facultyName").value.trim();
+            const facultyLoginId = document.getElementById("facultyLoginId").value.trim();
+            const messageElement = document.getElementById("message");
+
+            try {
+                // Check if the login ID already exists in the "users" collection
+                
+                const userDoc = await db
+                    .collection("school")
+                    .doc(selectedDomain)
+                    .collection("users")
+                    .doc(facultyLoginId)
+                    .get();
+
+                if (userDoc.exists) {
+                    // Login ID already exists
+                    messageElement.textContent = "Error: Login ID already exists! Try another.";
+                    messageElement.style.color = "red";
+                } else {
+                    // Add the new faculty login ID
+                    await db
+                        .collection("school")
+                        .doc(selectedDomain)
+                        .collection("users")
+                        .doc(facultyLoginId)
+                        .set({
+                            name: facultyName,
+                            created_at: firebase.firestore.FieldValue.serverTimestamp(),
+                            role: "teacher",
+                            profile_picture: null,
+                        });
+
+                    // Success message
+                    messageElement.textContent = "";
+                    const popup = document.getElementById("successPopup");
+                    popup.style.display = "block";
+                    popup.style.opacity = "1";
+
+                    // Fade out and hide popup after 3 seconds
+                    setTimeout(() => {
+                        popup.style.opacity = "0"; // Start fade-out
+                        setTimeout(() => {
+                            popup.style.display = "none"; // Hide after fade-out
+                        }, 500); // Wait for the fade-out transition to complete
+                    }, 3000); // Display for 3 seconds before fading
+                    // Optionally reset the form
+                    document.getElementById("facultyForm").reset();
+                }
+            } catch (error) {
+                console.error("Error creating faculty account:", error);
+                messageElement.textContent = "Error creating account. Please try again.";
+                messageElement.style.color = "red";
+            }
+        }
+    </script>
+</body>
+</html>
